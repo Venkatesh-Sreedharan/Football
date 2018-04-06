@@ -22,6 +22,6 @@ while True:
 			if time in link.get('href'):
 				JW =link.get('href')
 				if JW not in article:
-					os.system("terminal-notifier -title ''\"{}\"' just published a piece' -message 'Check it now' -open \"{}\" -appIcon '/Users/venkateshs/Desktop/Personal/football_noti.png'".format(author,JW))
+					os.system("terminal-notifier -title ''\"{}\"' just published a piece' -message 'Check it now' -open \"{}\" -appIcon 'football_noti.png'".format(author,JW))
 					article.append(JW)
 	sleep(3600)
