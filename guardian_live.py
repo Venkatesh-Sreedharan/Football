@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 from time import sleep
 import urllib2
 import certifi
+import pdb
 from datetime import datetime
+import re
 
 
 # def get_team_names():
@@ -29,6 +31,20 @@ def get_commentary(url):
 		commentary.extend(get_commentary("https://www.theguardian.com/"+nav))
 	return commentary
 
+def get_player_names(commentary):
+	players_regex = re.findall('([a-zA-Z]+)(,|\.)', str(commentary[commentary.find(":"):commentary.find("Referee")]))
+	players = [names[0] for names in players_regex]
+	return players
+
+def mapping_commentary_to_players(commentary):
+	active_players = [player for player in players if player in commentary[1]]
+	return (commentary,active_players)
+
 url = 'https://www.theguardian.com/football/live/2018/may/10/west-ham-united-v-manchester-united-premier-league-live'
 commentary = get_commentary(url)
+players = get_player_names(commentary[-2][1])
+mapping = map(mapping_commentary_to_players,commentary)
+
+
+
 
