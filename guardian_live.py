@@ -82,7 +82,7 @@ mapping = map(mapping_commentary_to_players,commentary)
 
 stopwords_teams = teams_involved(url)
 
-player = 'Pogba'
+player = 'Arnautovic'
 player_commentary = filter(get_player_text,mapping)
 
 player_commentary_agg = ''
