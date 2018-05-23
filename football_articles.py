@@ -30,7 +30,7 @@ def soup_creation(url_author):
 def content_extraction(content):
 	global article
 	year = datetime.now().strftime('%Y')
-	day = '21'
+	day = datetime.now().strftime('%d')
 	piece = content[0][0].get('href')
 
 	if 'guardian' in piece:
