@@ -21,9 +21,10 @@ def word_cloud(commentary):
 	plt.axis("off")
 	plt.show()
 
-def aggregate_commentary(commentary):
-	global player_commentary_agg
+def aggregate_commentary(commentary,player_commentary_agg):
+	# global player_commentary_agg
 	player_commentary_agg = player_commentary_agg + commentary[0][1]
+	return player_commentary_agg
 
 
 def get_player_text(commentary):
@@ -45,7 +46,9 @@ def teams_involved(url):
 	content = urllib2.urlopen(url,cafile=certifi.where()).read()
 	soup = BeautifulSoup(content,"lxml")
 	teams = soup.find_all(class_ = 'block-title')[0].text
-	return teams[teams.find(":")+2:].split(' ')
+	home_team = teams[13:].split("-")[0][:-2]
+	away_team = teams[13:].split("-")[1][2:]
+	return (teams[teams.find(":")+2:].split(' '),home_team,away_team)
 
 
 def get_commentary(url):
@@ -80,13 +83,13 @@ commentary = commentary[:-2]
 
 mapping = map(mapping_commentary_to_players,commentary)
 
-stopwords_teams = teams_involved(url)
+stopwords_teams = teams_involved(url)[0]
 
 player = 'Arnautovic'
 player_commentary = filter(get_player_text,mapping)
 
 player_commentary_agg = ''
-map(aggregate_commentary,player_commentary)
+player_commentary_agg = map(lambda x:aggregate_commentary(x,player_commentary_agg),player_commentary)
 
 stopwords = set(STOPWORDS)
 stopwords.add(player)
