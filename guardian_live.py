@@ -82,7 +82,7 @@ def get_player_names(commentary):
 	players = [names[0] for names in players_regex]
 	return players
 
-def mapping_commentary_to_players(commentary):
+def mapping_commentary_to_players(commentary,players):
 	active_players = [player for player in players if player in commentary[1]]
 	return (commentary,active_players)
 
@@ -119,7 +119,7 @@ players = get_player_names(commentary[-2][1])
 #Last two values of tuples gives team news. Not necessary.
 commentary = commentary[:-2]
 
-mapping = map(mapping_commentary_to_players,commentary)
+mapping = map(lambda x:mapping_commentary_to_players(x,players),commentary)
 
 stopwords_teams = teams_involved(url)[0]
 
