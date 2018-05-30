@@ -38,8 +38,8 @@ def aggregate_commentary(commentary,player_commentary_agg):
 	return player_commentary_agg
 
 
-def get_player_text(commentary):
-	if player in commentary[1]:
+def get_player_text(commentary,player_name):
+	if player_name in commentary[1]:
 		return True
 
 def getText(node):
@@ -71,56 +71,81 @@ def get_commentary(url):
 		commentary.extend(get_commentary("https://www.theguardian.com/"+nav))
 	return commentary
 
+def was_home(player_name,players):
+	if players.index(player_name) < 18:
+		return 1
+	else:
+		return 0
+	# return [1 if players.index(player_name) < 18 else 0]
+
 def get_player_names(commentary):
 	players_regex = re.findall('([a-zA-Z]+)(,|\.)', str(commentary[commentary.find(":"):commentary.find("Referee")]))
 	players = [names[0] for names in players_regex]
+	# home_away = was_home(players)
+	# players = zip(players,home_away)
 	return players
 
 def mapping_commentary_to_players(commentary):
 	active_players = [player for player in players if player in commentary[1]]
 	return (commentary,active_players)
 
-def list_to_dataframe(player_details_list):
-	player_details_df = pd.DataFrame(np.array(player_details_list).reshape(1,5),columns = ['player_commentary','player_name','home_team','away_team','was_home'])
-	return player_details_df
+
+def player_details(player_name,mapping,home_team,away_team,players):
+
+	home_or_away = was_home(player_name,players)
+
+
+	player_commentary = filter(lambda x:get_player_text(x,player_name),mapping)
+
+	player_commentary_agg = ''
+	player_commentary_agg = map(lambda x:aggregate_commentary(x,player_commentary_agg),player_commentary)
+
+	player_commentary_agg = ('').join(player_commentary_agg)
+	player_details_list = [player_commentary_agg,player_name,home_team,away_team,home_or_away]
+
+	return player_details_list
+
+
+
+def list_to_dataframe(player_list):
+	return pd.DataFrame(player_list,columns = ['player_commentary','player_name','home_team','away_team','was_home'])
 
 
 unwanted_words = ['Reuters','Getty','Photograph']
+
+
 url = 'https://www.theguardian.com/football/live/2018/may/10/west-ham-united-v-manchester-united-premier-league-live'
 
 
 commentary = get_commentary(url)
 players = get_player_names(commentary[-2][1])
 
+
 #Last two values of tuples gives team news. Not necessary.
 commentary = commentary[:-2]
-
 
 mapping = map(mapping_commentary_to_players,commentary)
 
 stopwords_teams = teams_involved(url)[0]
+
+stopwords = set(STOPWORDS)
+stopwords.add('ball')
+stopwords.add('goal')
+stopwords.add('cross')
+stopwords.update(stopwords_teams)
+stopwords.update(unwanted_words)
+stopwords.update(players)
+stopwords.update(map(lambda x:x+'s',players))
+
 home_team = teams_involved(url)[1]
 away_team = teams_involved(url)[2]
 
-player = 'Arnautovic'
-player_commentary = filter(get_player_text,mapping)
 
-player_commentary_agg = ''
-player_commentary_agg = map(lambda x:aggregate_commentary(x,player_commentary_agg),player_commentary)
+player_ = map(lambda x:player_details(x,mapping,home_team,away_team,players),players)
 
-player_commentary_agg = ('').join(player_commentary_agg)
-player_details_list = [player_commentary_agg,player,home_team,away_team,1]
+player_details_df = list_to_dataframe(player_)
 
-player_details_df = list_to_dataframe(player_details_list)
 writing(player_details_df)
-
-
-stopwords = set(STOPWORDS)
-stopwords.add(player)
-stopwords.add(player+'s')
-stopwords.update(stopwords_teams)
-stopwords.update(unwanted_words)
-
 # word_cloud(player_commentary_agg)
 
 
