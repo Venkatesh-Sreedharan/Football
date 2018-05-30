@@ -76,13 +76,10 @@ def was_home(player_name,players):
 		return 1
 	else:
 		return 0
-	# return [1 if players.index(player_name) < 18 else 0]
 
 def get_player_names(commentary):
 	players_regex = re.findall('([a-zA-Z]+)(,|\.)', str(commentary[commentary.find(":"):commentary.find("Referee")]))
 	players = [names[0] for names in players_regex]
-	# home_away = was_home(players)
-	# players = zip(players,home_away)
 	return players
 
 def mapping_commentary_to_players(commentary):
@@ -104,8 +101,6 @@ def player_details(player_name,mapping,home_team,away_team,players):
 	player_details_list = [player_commentary_agg,player_name,home_team,away_team,home_or_away]
 
 	return player_details_list
-
-
 
 def list_to_dataframe(player_list):
 	return pd.DataFrame(player_list,columns = ['player_commentary','player_name','home_team','away_team','was_home'])
